@@ -24,6 +24,7 @@ interface PrepareServiceInterface
     public function deposit(
         Wallet $wallet,
         float|int|string $amount,
+        float|int|string $fee,
         ?array $meta,
         bool $confirmed = true,
         ?string $uuid = null
@@ -37,6 +38,7 @@ interface PrepareServiceInterface
     public function withdraw(
         Wallet $wallet,
         float|int|string $amount,
+        float|int|string $fee,
         ?array $meta,
         bool $confirmed = true,
         ?string $uuid = null

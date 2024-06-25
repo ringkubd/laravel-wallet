@@ -17,6 +17,7 @@ interface TransactionDtoTransformerInterface
      *     wallet_id: int,
      *     type: string,
      *     amount: float|int|string,
+     *     fee: float|int|string,
      *     confirmed: bool,
      *     meta: array<mixed>|null,
      *     created_at: DateTimeImmutable,

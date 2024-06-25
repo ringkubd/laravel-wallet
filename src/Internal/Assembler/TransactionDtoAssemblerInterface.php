@@ -17,6 +17,7 @@ interface TransactionDtoAssemblerInterface
         int $walletId,
         string $type,
         float|int|string $amount,
+        float|int|string $fee,
         bool $confirmed,
         ?array $meta,
         ?string $uuid

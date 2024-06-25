@@ -19,6 +19,7 @@ final readonly class TransactionDto implements TransactionDtoInterface
         private int $walletId,
         private string $type,
         private float|int|string $amount,
+        private float|int|string $fee,
         private bool $confirmed,
         private ?array $meta,
         private DateTimeImmutable $createdAt,
@@ -74,5 +75,13 @@ final readonly class TransactionDto implements TransactionDtoInterface
     public function getUpdatedAt(): DateTimeImmutable
     {
         return $this->updatedAt;
+    }
+
+    /**
+     * @return float|int|string
+     */
+    public function getFee(): float|int|string
+    {
+        return  $this->fee;
     }
 }

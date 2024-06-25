@@ -55,6 +55,7 @@ class Transaction extends Model
         'uuid',
         'type',
         'amount',
+        'fee',
         'confirmed',
         'meta',
         'created_at',
@@ -123,6 +124,33 @@ class Transaction extends Model
         $decimalPlaces = $math->powTen($decimalPlacesValue);
 
         $this->amount = $math->round($math->mul($amount, $decimalPlaces));
+    }
+
+    public function getFeeIntAttribute(): int
+    {
+        return (int) $this->fee;
+    }
+
+    public function getFeeFloatAttribute(): string
+    {
+        $math = app(MathServiceInterface::class);
+        $decimalPlacesValue = app(CastServiceInterface::class)
+            ->getWallet($this->wallet)
+            ->decimal_places;
+        $decimalPlaces = $math->powTen($decimalPlacesValue);
+
+        return $math->div($this->fee, $decimalPlaces, $decimalPlacesValue);
+    }
+
+    public function setFeeFloatAttribute(float|int|string $amount): void
+    {
+        $math = app(MathServiceInterface::class);
+        $decimalPlacesValue = app(CastServiceInterface::class)
+            ->getWallet($this->wallet)
+            ->decimal_places;
+        $decimalPlaces = $math->powTen($decimalPlacesValue);
+
+        $this->fee = $math->round($math->mul($amount, $decimalPlaces));
     }
 
     protected static function boot(): void

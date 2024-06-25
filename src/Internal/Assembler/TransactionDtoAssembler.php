@@ -23,6 +23,7 @@ final readonly class TransactionDtoAssembler implements TransactionDtoAssemblerI
         int $walletId,
         string $type,
         float|int|string $amount,
+        float|int|string $fee,
         bool $confirmed,
         ?array $meta,
         ?string $uuid
@@ -34,6 +35,7 @@ final readonly class TransactionDtoAssembler implements TransactionDtoAssemblerI
             $walletId,
             $type,
             $amount,
+            $fee,
             $confirmed,
             $meta,
             $this->clockService->now(),

@@ -15,6 +15,7 @@ use Bavix\Wallet\Internal\Dto\TransferLazyDtoInterface;
 use Bavix\Wallet\Internal\Service\MathServiceInterface;
 use Bavix\Wallet\Models\Transaction;
 use Bavix\Wallet\Models\Wallet as WalletModel;
+use Exception;
 
 /**
  * @internal
@@ -39,18 +40,19 @@ final readonly class PrepareService implements PrepareServiceInterface
     public function deposit(
         Wallet $wallet,
         float|int|string $amount,
+        float|int|string $fee,
         ?array $meta,
         bool $confirmed = true,
         ?string $uuid = null
     ): TransactionDtoInterface {
         $this->consistencyService->checkPositive($amount);
-
         return $this->transactionDtoAssembler->create(
             $this->castService->getHolder($wallet),
             $this->castService->getWallet($wallet)
                 ->getKey(),
             Transaction::TYPE_DEPOSIT,
             $amount,
+            $fee,
             $confirmed,
             $meta,
             $uuid
@@ -63,6 +65,7 @@ final readonly class PrepareService implements PrepareServiceInterface
     public function withdraw(
         Wallet $wallet,
         float|int|string $amount,
+        float|int|string $fee,
         ?array $meta,
         bool $confirmed = true,
         ?string $uuid = null
@@ -75,6 +78,7 @@ final readonly class PrepareService implements PrepareServiceInterface
                 ->getKey(),
             Transaction::TYPE_WITHDRAW,
             $this->mathService->negative($amount),
+            $fee,
             $confirmed,
             $meta,
             $uuid
@@ -124,6 +128,7 @@ final readonly class PrepareService implements PrepareServiceInterface
         $withdraw = $this->withdraw(
             $fromWallet,
             $withdrawAmount,
+            $fee,
             $withdrawOption->getMeta(),
             $withdrawOption->isConfirmed(),
             $withdrawOption->getUuid(),
@@ -132,6 +137,7 @@ final readonly class PrepareService implements PrepareServiceInterface
         $deposit = $this->deposit(
             $toWallet,
             $depositAmount,
+            $fee,
             $depositOption->getMeta(),
             $depositOption->isConfirmed(),
             $depositOption->getUuid(),
@@ -149,4 +155,5 @@ final readonly class PrepareService implements PrepareServiceInterface
             $extra->getExtra(),
         );
     }
+
 }

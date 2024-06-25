@@ -40,6 +40,70 @@ final readonly class TaxService implements TaxServiceInterface
          *
          * @see https://github.com/bavix/laravel-wallet/issues/64#issuecomment-514483143
          */
+        return $this->extracted($wallet, $fee);
+    }
+
+    /**
+     * @param Wallet $wallet
+     * @param float|int|string $amount
+     * @return string
+     */
+    public function getDepositFee(Wallet $wallet, float|int|string $amount): string
+    {
+        $fee = 0;
+        if ($wallet instanceof Taxable) {
+            $fee = $this->mathService->floor(
+                $this->mathService->div(
+                    $this->mathService->mul($amount, $wallet->getDepositFeePercent(), 0),
+                    100,
+                    $this->castService->getWallet($wallet)
+                        ->decimal_places
+                )
+            );
+        }
+
+        /**
+         * Added minimum commission condition.
+         *
+         * @see https://github.com/bavix/laravel-wallet/issues/64#issuecomment-514483143
+         */
+        return $this->extracted($wallet, $fee);
+    }
+
+    /**
+     * @param Wallet $wallet
+     * @param float|int|string $amount
+     * @return string
+     */
+    public function getWithdrawFee(Wallet $wallet, float|int|string $amount): string
+    {
+        $fee = 0;
+        if ($wallet instanceof Taxable) {
+            $fee = $this->mathService->floor(
+                $this->mathService->div(
+                    $this->mathService->mul($amount, $wallet->getWithdrawFeePercent(), 0),
+                    100,
+                    $this->castService->getWallet($wallet)
+                        ->decimal_places
+                )
+            );
+        }
+
+        /**
+         * Added minimum commission condition.
+         *
+         * @see https://github.com/bavix/laravel-wallet/issues/64#issuecomment-514483143
+         */
+        return $this->extracted($wallet, $fee);
+    }
+
+    /**
+     * @param mixed $wallet
+     * @param int|string $fee
+     * @return string
+     */
+    public function extracted(mixed $wallet, int|string $fee): string
+    {
         if ($wallet instanceof MinimalTaxable) {
             $minimal = $wallet->getMinimalFee();
             if ($this->mathService->compare($fee, $minimal) === -1) {
@@ -54,6 +118,6 @@ final readonly class TaxService implements TaxServiceInterface
             }
         }
 
-        return (string) $fee;
+        return (string)$fee;
     }
 }

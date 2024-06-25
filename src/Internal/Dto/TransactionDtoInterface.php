@@ -19,6 +19,7 @@ interface TransactionDtoInterface
     public function getType(): string;
 
     public function getAmount(): float|int|string;
+    public function getFee(): float|int|string;
 
     public function isConfirmed(): bool;
 

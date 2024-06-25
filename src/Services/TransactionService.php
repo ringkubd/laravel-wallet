@@ -9,6 +9,7 @@ use Bavix\Wallet\Internal\Assembler\TransactionCreatedEventAssemblerInterface;
 use Bavix\Wallet\Internal\Dto\TransactionDtoInterface;
 use Bavix\Wallet\Internal\Exceptions\RecordNotFoundException;
 use Bavix\Wallet\Internal\Service\DispatcherServiceInterface;
+use Bavix\Wallet\Internal\Service\MathServiceInterface;
 use Bavix\Wallet\Models\Transaction;
 
 /**
@@ -39,9 +40,18 @@ final readonly class TransactionService implements TransactionServiceInterface
     ): Transaction {
         assert(in_array($type, [Transaction::TYPE_DEPOSIT, Transaction::TYPE_WITHDRAW], true));
 
+        $taxService = app(TaxServiceInterface::class);
+
+        $fee = $type === Transaction::TYPE_DEPOSIT
+            ? $taxService->getDepositFee($wallet, $amount)
+            : $taxService->getWithdrawFee($wallet, $amount);
+        $mathService = app(MathServiceInterface::class);
+
+        $amount = $mathService->sub($amount, $fee, $wallet->decimal_places);
+
         $dto = $type === Transaction::TYPE_DEPOSIT
-            ? $this->prepareService->deposit($wallet, (string) $amount, $meta, $confirmed)
-            : $this->prepareService->withdraw($wallet, (string) $amount, $meta, $confirmed);
+            ? $this->prepareService->deposit($wallet, (string) $amount, $fee, $meta, $confirmed, Transaction::TYPE_DEPOSIT)
+            : $this->prepareService->withdraw($wallet, (string) $amount, $fee, $meta, $confirmed, Transaction::TYPE_WITHDRAW);
 
         $transactions = $this->apply([
             $dto->getWalletId() => $wallet,
